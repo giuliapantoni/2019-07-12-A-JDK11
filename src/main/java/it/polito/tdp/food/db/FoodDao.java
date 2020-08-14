@@ -135,6 +135,32 @@ public class FoodDao {
 		}
 		
 	}
+
+	public Double calorieCongiunte(Food f1, Food f2) {
+		
+		String sql = "SELECT fc1.food_code, fc2.food_code, AVG(condiment.condiment_calories) as avg " + 
+				"FROM food_condiment AS fc1, food_condiment as fc2, condiment " + 
+				"WHERE fc1.condiment_code = fc2.condiment_code " + 
+				"AND fc1.condiment_code = condiment.condiment_code " + 
+				"AND fc1.id <> fc2.id " + 
+				"AND fc1.food_code = ? AND fc2.food_code = ? " + 
+				"GROUP BY fc1.food_code, fc2.food_code " ;
+		Double peso = null ;
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, f1.getFood_code());
+			st.setInt(2, f2.getFood_code());
+			ResultSet rs = st.executeQuery();
+			if(rs.first())
+				peso = rs.getDouble("avg");
+			conn.close();
+			return peso;
+		}catch(SQLException e ) {
+			e.printStackTrace();
+		}
+		return peso;
+	}
 	
 	
 	
