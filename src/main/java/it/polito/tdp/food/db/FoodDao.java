@@ -12,6 +12,7 @@ import it.polito.tdp.food.model.Food;
 import it.polito.tdp.food.model.Portion;
 
 public class FoodDao {
+	
 	public List<Food> listAllFoods(){
 		String sql = "SELECT * FROM food" ;
 		try {
@@ -109,4 +110,55 @@ public class FoodDao {
 		}
 
 	}
+	
+	public List<Food> getFoodsByPortions(int portions){
+		String sql = "SELECT food.food_code, food.display_name, COUNT(DISTINCT portion.portion_id) AS cnt " + 
+				"FROM food, `portion` " + 
+				"WHERE food.food_code = portion.food_code " + 
+				"GROUP BY food.food_code " + 
+				"HAVING cnt = ? " + 
+				"ORDER BY food.display_name ASC ";
+		List<Food> result = new ArrayList<Food>();
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, portions);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				result.add(new Food(rs.getInt("food_code"), rs.getString("display_name")));
+			}
+			conn.close();
+			return result;
+		}catch(SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
